@@ -1,17 +1,13 @@
 import random
 import re
-import time
+from pathlib import Path
 
 """
-
-Időmérés: 
-
-start_time = time.monotonic()
-
-do_something
-
-print('seconds: ', time.monotonic() - start_time)
-
+10 pont: A program fájlon dolgozik fájlból olvas be egy listába és az eredményeket is fájlba írja ki mint absolute és relativ path-el.
+10 pont: Van capturing group illesztés.
+10 pont: Mivel van capturing group ahhoz kell backreferenc is és az is van.
+10 pont: Van egy kártyalap dekóder amibe található pozitív lookahead.
+Szerintem ez összesen 40 pont.
 """
 
 PAIR_REGEX = "([2-9TJQKA])[schd].*\\1[schd]"
@@ -21,7 +17,9 @@ POKER_REGEX = "([2-9TJQKA])[schd](?:.*\\1[schd]){3}"
 FLUSH_REGEX = "[2-9TJQKA]([schd])(?:.*[2-9TJQKA]\\1){4}"
 DECODER_REGEX = "([0-9])(?=\\w)(\\w)"
 
-
+"""
+Véletlenszerű input fájl generálás
+""" 
 def generateInput():
     result = ""
     n = 0
@@ -34,7 +32,11 @@ def generateInput():
         writeFile("input.txt", result)
         n += 1
 
-
+"""
+readFile függvény aminek a segítségével egy fájlból olvasunk be adatokat egy listába
+:param filename: Fájl neve amiből olvasni szeretnénk
+:return: lista amiben a fájlban lévő adatok vannak
+"""
 def readFile(filename):
     result = list()
     with open(filename, "r") as file:
@@ -44,7 +46,12 @@ def readFile(filename):
             line = file.readline()
     return result
 
-
+"""
+Count függvény aminek a segítségével egy listában olyan sorokat keresünk amelyre a megadott regex illeszkedik
+:param regex: Az illeszteni kívánt regex
+:param lista: Lista ami tartalmazza a kártya lapokat soronként
+:param: filename: Fájl neve ahova beszeretnénk írni az eredményt
+"""
 def count(regex, lista, filename):
     result = {"count": 0, "sorok": []}
     for line in lista:
@@ -53,7 +60,12 @@ def count(regex, lista, filename):
             result["sorok"].append(line)
     writeFile(filename, result)
 
-
+"""
+decoder függvény aminek a segítségével dekódoljuk a kártyalapokat
+:param regex: Regex amire illeszteni szeretnénk a listába lévő sorokat
+:param lista: Lista amibe a kártyalapok vannak eltárolva
+:param filename: Fájl neve ahova az eredményt szeretnénk beírni 
+"""
 def decoder(regex,lista, filename):
     result = list()
     for line in lista:
@@ -69,7 +81,11 @@ def decoder(regex,lista, filename):
             result.append(replaced)
     writeFile(filename, result)
 
-
+"""
+writeFile függvény ami segítségével fájlba írunk ki adatokat
+:param filename: A fájl neve amibe írni szeretnénk
+:param data: Az adat amit kiszeretnénk írni ez lehet dictionary, lista vagy sima szöveg
+"""
 def writeFile(filename, data):
     with open(filename, "w") as file:
         if isinstance(data, dict):
@@ -88,6 +104,9 @@ def writeFile(filename, data):
 
 if __name__ == "__main__":
     generateInput()
+    """Abszolút path"""
+    #path = Path('input.txt').absolute()
+    #lista = readFile(path)
     lista = readFile("input.txt")
     count(PAIR_REGEX, lista, "par.txt")
     count(TWO_PAIR_REGEX, lista, "ketpar.txt")
@@ -95,4 +114,5 @@ if __name__ == "__main__":
     count(POKER_REGEX, lista, "poker.txt")
     count(DRILL_REGEX, lista, "drill.txt")
     decoder(DECODER_REGEX, lista, "dekodoltKartyak.txt")
+    
 
